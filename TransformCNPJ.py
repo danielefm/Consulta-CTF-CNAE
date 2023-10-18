@@ -12,6 +12,9 @@ def TransformCNPJ(caminho_pasta):
         if arquivo == ".DS_Store":
             continue  # Ignorar o arquivo .DS_Store
         
+        if arquivo == "CNPJ_final.csv":
+            continue  # Ignorar o arquivo
+        
         caminho_arquivo = os.path.join(caminho_pasta, arquivo)
 
         print(caminho_arquivo)
@@ -36,30 +39,21 @@ def TransformCNPJ(caminho_pasta):
         colunas = ['CNPJ'] + [col for col in df.columns if col not in ['CNPJ', 0, 1, 2, 5]]
         df = df[colunas]
 
+        # Passo 5: trocar as vírgulas por hífens no CNAE secundário
+        df[12] = df[12].fillna('')
+        df[12] = df[12].str.replace(',','-')
+
+        # Passo 6: Consolidar CNAES principal e secundários em uma única coluna
+        df['CNAE'] = df[11] + '-' + df[12]
+        df = df.drop([11,12], axis=1)
+        df = df.rename(columns={4:'Nome Fantasia'})
+
         print(df.head())
 
         dfs.append(df)
 
     # Passo 4: Consolidar os DataFrames em um único DataFrame
     df_consolidado = pd.concat(dfs, ignore_index=True)
-
-    # Passo 5: Renomear as colunas do DataFrame consolidado
-    novos_nomes = {4: 'NomeFantasia',
-                   11: 'CNAE',
-                   12: 'CNAESsecundarios'}
-    df_consolidado = df_consolidado.rename(columns=novos_nomes)
-
-    # Passo 6: Extrair os CNAESsecundarios
-    df_consolidado['CNAESsecundarios'] = df_consolidado['CNAESsecundarios'].str.split(',')
-
-    df_adicionais = df_consolidado.explode('CNAESsecundarios')
-    df_adicionais = df_adicionais.drop('CNAE', axis = 1)
-    df_adicionais = df_adicionais.rename(columns={'CNAESsecundarios':'CNAE'})
-    df_adicionais = df_adicionais.dropna(subset='CNAE')
-
-    df_consolidado.drop('CNAESsecundarios', axis=1, inplace=True)
-
-    df_consolidado.append(df_adicionais)
 
     # Salvar o DataFrame consolidado como um novo arquivo CSV
     caminho_saida = os.path.join(caminho_pasta, 'CNPJ_final.csv')  # Substitua pelo caminho e nome do arquivo desejado

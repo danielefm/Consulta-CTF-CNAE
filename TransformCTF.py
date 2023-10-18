@@ -15,6 +15,9 @@ def TransformCTF(caminho_pasta):
         if arquivo == ".DS_Store":
             continue  # Ignorar o arquivo .DS_Store
 
+        if arquivo == "CTF_final.csv":
+            continue  # Ignorar o arquivo
+
         # Passo 1: Importar o CSV como DataFrame
         df = pd.read_csv(caminho_arquivo,
                          encoding="utf-8",
@@ -35,11 +38,18 @@ def TransformCTF(caminho_pasta):
         # Passo 5: Criar uma coluna com a atividade do CTF consolidada
         df["CatCTF"] = df['Código da categoria'].map(str) + '-' + df['Código da atividade'].map(str)
 
+        # Passo 6: Manter apenas as colunas de interesse
+        colunas = ["CNPJ",
+                   "Razão Social",
+                   "CatCTF"]
+
+        df = df[colunas]
+
         dfs.append(df)
 
-    # Passo 6: Consolidar os DataFrames em um único DataFrame
+    # Passo 7: Consolidar os DataFrames em um único DataFrame
     df_consolidado = pd.concat(dfs, ignore_index=True)
 
-    # Salvar o DataFrame consolidado como um novo arquivo CSV
+    # Passo 8 Salvar o DataFrame consolidado como um novo arquivo CSV
     caminho_saida = os.path.join(caminho_pasta, 'CTF_final.csv')  # Substitua pelo caminho e nome do arquivo desejado
     df_consolidado.to_csv(caminho_saida, index=False)

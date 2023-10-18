@@ -41,10 +41,10 @@ ctf_dir = 'Dados CTF IBAMA'
 
 ###### Início do programa de fato
 
-#GetFilesOnline(cnpj_url_list,cnpj_dir)
-#GetFilesOnline(ctf_url_list, ctf_dir)
+GetFilesOnline(cnpj_url_list,cnpj_dir)
+GetFilesOnline(ctf_url_list, ctf_dir)
 
-#TransformCNPJ(cnpj_dir)
+TransformCNPJ(cnpj_dir)
 TransformCTF(ctf_dir)
 
 Join_DFs(os.path.join(cnpj_dir, 'CNPJ_final.csv'),
