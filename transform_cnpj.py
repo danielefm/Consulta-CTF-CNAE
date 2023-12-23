@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-def TransformCNPJ(caminho_pasta):
+def transform_cnpj(caminho_pasta):
     
     # Passo 0: Importar cada CSV como um DataFrame e aplicar as transformações
 
@@ -35,7 +35,9 @@ def TransformCNPJ(caminho_pasta):
         df = df[df[5]=="02"]
 
         # Passo 4: Reformatar as colunas com o número de CNPJ
-        df['CNPJ'] = df[0].str[:2] + '.' + df[0].str[2:5] + '.' + df[0].str[5:8] + '/' + df[1] + '-' + df[2]
+        #df['CNPJ'] = df[0].str[:2] + '.' + df[0].str[2:5] + '.' + df[0].str[5:8] + '/' + df[1] + '-' + df[2]
+        df['CNPJ'] = df[0].str[:2] + df[0].str[2:5] + df[0].str[5:8] + df[1] + df[2]
+
         colunas = ['CNPJ'] + [col for col in df.columns if col not in ['CNPJ', 0, 1, 2, 5]]
         df = df[colunas]
 

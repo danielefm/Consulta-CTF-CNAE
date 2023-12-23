@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-def TransformCTF(caminho_pasta):
+def transform_ctf(caminho_pasta):
     
     # Passo 1: Importar cada CSV como um DataFrame e aplicar as transformações
 
@@ -27,7 +27,7 @@ def TransformCTF(caminho_pasta):
                         )
             
         # Passo 2: Formatar o CNPJ
-        df['CNPJ'] = df["CNPJ"].str[:2] + '.' + df["CNPJ"].str[2:5] + '.' + df["CNPJ"].str[5:8] + '/' + df["CNPJ"].str[8:12] + '-' + df["CNPJ"].str[12:]          
+        #df['CNPJ'] = df["CNPJ"].str[:2] + '.' + df["CNPJ"].str[2:5] + '.' + df["CNPJ"].str[5:8] + '/' + df["CNPJ"].str[8:12] + '-' + df["CNPJ"].str[12:]
         
         # Passo 3: Manter apenas as linhas que não tenham data de término da atividade
         df = df[df['Data de término da atividade'].isna()]

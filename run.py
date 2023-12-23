@@ -2,10 +2,10 @@ import os
 import requests
 import zipfile
 import pandas as pd
-from GetFilesOnline import GetFilesOnline
-from TransformCNPJ import TransformCNPJ
-from TransformCTF import TransformCTF
-from JoinDFs import Join_DFs
+from get_files_online import get_files_online
+from transform_cnpj import transform_cnpj
+from transform_ctf import transform_ctf
+from join_dfs import join_dfs
 
 # Lista de URLs para download de arquivos ZIP
 cnpj_url_list = [
@@ -41,11 +41,11 @@ ctf_dir = 'Dados CTF IBAMA'
 
 ###### Início do programa de fato
 
-GetFilesOnline(cnpj_url_list,cnpj_dir)
-GetFilesOnline(ctf_url_list, ctf_dir)
+get_files_online(cnpj_url_list,cnpj_dir)
+get_files_online(ctf_url_list, ctf_dir)
 
-TransformCNPJ(cnpj_dir)
-TransformCTF(ctf_dir)
+transform_cnpj(cnpj_dir)
+transform_ctf(ctf_dir)
 
-Join_DFs(os.path.join(cnpj_dir, 'CNPJ_final.csv'),
+join_dfs(os.path.join(cnpj_dir, 'CNPJ_final.csv'),
          os.path.join(ctf_dir, 'CTF_final.csv'))

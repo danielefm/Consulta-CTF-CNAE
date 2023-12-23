@@ -3,7 +3,7 @@ import requests
 import zipfile
 import pandas as pd
 
-def GetFilesOnline(url_list, download_dir):
+def get_files_online(url_list, download_dir):
 
     # Crie o diretório de destino se ele não existir
     os.makedirs(download_dir, exist_ok=True)
