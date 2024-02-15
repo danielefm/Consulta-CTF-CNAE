@@ -7,6 +7,12 @@ from transform_cnpj import transform_cnpj
 from transform_ctf import transform_ctf
 from join_dfs import join_dfs
 
+# Diretório de trabalho (salvar arquivos temporários)
+temp_dir = 'temp_folder'
+
+# Diretório final (salvar arquivos que vão alimentar o BI)
+final_dir = 'fonte_BI'
+
 # Lista de URLs para download de arquivos ZIP
 cnpj_url_list = [
     'http://dadosabertos.rfb.gov.br/CNPJ/Estabelecimentos0.zip',
@@ -21,10 +27,6 @@ cnpj_url_list = [
     'http://dadosabertos.rfb.gov.br/CNPJ/Estabelecimentos9.zip'   
 ]
 
-# Diretório de destino para salvar os arquivos ZIP
-cnpj_dir = 'Dados CNPJ'
-
-
 # Lista de URLs para os dados do CTF
 url_base = "http://dadosabertos.ibama.gov.br/dados/CTF/APP/"
 estados = ["AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
@@ -37,15 +39,14 @@ for estado in estados:
     url = f"{url_base}{estado}/pessoasJuridicas.csv"
     ctf_url_list.append(url)
 
-ctf_dir = 'Dados CTF IBAMA'
+###### Download dos dados da Receita Federal
 
-###### Início do programa de fato
+#get_files_online(cnpj_url_list, temp_dir)
+#transform_cnpj(temp_dir, final_dir)
 
-get_files_online(cnpj_url_list,cnpj_dir)
-get_files_online(ctf_url_list, ctf_dir)
 
-transform_cnpj(cnpj_dir)
-transform_ctf(ctf_dir)
+#get_files_online(ctf_url_list, temp_dir)
+transform_ctf(temp_dir, final_dir)
 
-join_dfs(os.path.join(cnpj_dir, 'CNPJ_final.csv'),
-         os.path.join(ctf_dir, 'CTF_final.csv'))
+#join_dfs(os.path.join(cnpj_dir, 'CNPJ_final.csv'),
+#         os.path.join(ctf_dir, 'CTF_final.csv'))
