@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-def transform_ctf(caminho_pasta):
+def transform_ctf(caminho_pasta, caminho_saida):
     
     # Passo 1: Importar cada CSV como um DataFrame e aplicar as transformações
 
@@ -36,14 +36,15 @@ def transform_ctf(caminho_pasta):
         df = df[df["Situação cadastral"]=="Ativa"]
 
         # Passo 5: Criar uma coluna com a atividade do CTF consolidada
-        df["CatCTF"] = df['Código da categoria'].map(str) + '-' + df['Código da atividade'].map(str)
+        df["ctf"] = df['Código da categoria'].map(str) + '-' + df['Código da atividade'].map(str)
 
         # Passo 6: Manter apenas as colunas de interesse
         colunas = ["CNPJ",
-                   "Razão Social",
-                   "CatCTF"]
+                   "ctf"]
 
         df = df[colunas]
+
+        df = df.rename(columns={'CNPJ':'cnpj'})
 
         dfs.append(df)
 
@@ -51,5 +52,4 @@ def transform_ctf(caminho_pasta):
     df_consolidado = pd.concat(dfs, ignore_index=True)
 
     # Passo 8 Salvar o DataFrame consolidado como um novo arquivo CSV
-    caminho_saida = os.path.join(caminho_pasta, 'CTF_final.csv')  # Substitua pelo caminho e nome do arquivo desejado
-    df_consolidado.to_csv(caminho_saida, index=False)
+    df_consolidado.to_csv(os.path.join(caminho_saida, 'ctf_empresas.csv'), index=False)

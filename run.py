@@ -21,8 +21,12 @@ cnpj_url_list = [
     'http://dadosabertos.rfb.gov.br/CNPJ/Estabelecimentos9.zip'   
 ]
 
+
 # Diretório de destino para salvar os arquivos ZIP
 cnpj_dir = 'Dados CNPJ'
+
+# Diretório de destino para salvar os arquivos que alimentarão o painel
+output_dir = 'Entrada do Painel'
 
 
 # Lista de URLs para os dados do CTF
@@ -41,11 +45,11 @@ ctf_dir = 'Dados CTF IBAMA'
 
 ###### Início do programa de fato
 
-get_files_online(cnpj_url_list,cnpj_dir)
-get_files_online(ctf_url_list, ctf_dir)
+#get_files_online(ctf_url_list, ctf_dir)
+#get_files_online(cnpj_url_list,cnpj_dir)
 
-transform_cnpj(cnpj_dir)
-transform_ctf(ctf_dir)
+#transform_cnpj(cnpj_dir, output_dir)
+transform_ctf(ctf_dir, output_dir)
 
-join_dfs(os.path.join(cnpj_dir, 'CNPJ_final.csv'),
-         os.path.join(ctf_dir, 'CTF_final.csv'))
+#join_dfs(os.path.join(cnpj_dir, 'CNPJ_final.csv'),
+#         os.path.join(ctf_dir, 'CTF_final.csv'))

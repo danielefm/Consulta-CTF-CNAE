@@ -1,25 +1,23 @@
 import os
 import pandas as pd
 
-def transform_cnpj(caminho_pasta):
+def transform_cnpj(caminho_pasta, caminho_saida):
     
-    # Passo 0: Importar cada CSV como um DataFrame e aplicar as transformações
+    # Importar cada CSV como um DataFrame e aplicar as transformações
 
-    dfs = []  # Uma lista para armazenar todos os DataFrames após as transformações
+    empresas = []  # Uma lista para armazenar todos os DataFrames após as transformações
+    cnaes_empresas = []
 
     for arquivo in os.listdir(caminho_pasta):
 
         if arquivo == ".DS_Store":
             continue  # Ignorar o arquivo .DS_Store
         
-        if arquivo == "CNPJ_final.csv":
-            continue  # Ignorar o arquivo
-        
         caminho_arquivo = os.path.join(caminho_pasta, arquivo)
 
         print(caminho_arquivo)
             
-        # Passo 1: Importar o CSV como DataFrame
+        # Importar o CSV como DataFrame
         df = pd.read_csv(caminho_arquivo,
                          encoding="windows-1251",
                          delimiter=";",
@@ -27,36 +25,49 @@ def transform_cnpj(caminho_pasta):
                          index_col=False,
                          dtype=str)
             
-        # Passo 2: Excluir as colunas que não são necessárias
+        # Excluir as colunas que não são necessárias
         cols = [0,1,2,4,5,11,12]
         df = df.iloc[:,cols]
             
-        # Passo 3: Manter apenas as linhas com o valor "02" na coluna de situação da empresa
+        # Manter apenas as linhas com o valor "02" na coluna de situação da empresa
         df = df[df[5]=="02"]
 
-        # Passo 4: Reformatar as colunas com o número de CNPJ
+        # Reformatar as colunas com o número de CNPJ
         #df['CNPJ'] = df[0].str[:2] + '.' + df[0].str[2:5] + '.' + df[0].str[5:8] + '/' + df[1] + '-' + df[2]
-        df['CNPJ'] = df[0].str[:2] + df[0].str[2:5] + df[0].str[5:8] + df[1] + df[2]
+        df['cnpj'] = df[0].str[:2] + df[0].str[2:5] + df[0].str[5:8] + df[1] + df[2]
 
-        colunas = ['CNPJ'] + [col for col in df.columns if col not in ['CNPJ', 0, 1, 2, 5]]
-        df = df[colunas]
+        df = df.rename(columns={4:'nome_fantasia',
+                                11:'cnae_primario',
+                                12:'cnaes_secundarios'}
+                      )
+        
+        empresa = df[['cnpj','nome_fantasia']]
 
-        # Passo 5: trocar as vírgulas por hífens no CNAE secundário
-        df[12] = df[12].fillna('')
-        df[12] = df[12].str.replace(',','-')
+        cnae_empresa = df[['cnpj','cnae_primario','cnaes_secundarios']].astype("string")
 
-        # Passo 6: Consolidar CNAES principal e secundários em uma única coluna
-        df['CNAE'] = df[11] + '-' + df[12]
-        df = df.drop([11,12], axis=1)
-        df = df.rename(columns={4:'Nome Fantasia'})
+        # NORMALIZANDO OS CNAES
+        # Transformando cnaes_secundarios em listas
+        cnae_empresa['cnaes_secundarios'] = cnae_empresa['cnaes_secundarios'].str.split(',')
 
-        print(df.head())
+        # Criando DataFrame com cnae primário
+        df_primario = cnae_empresa[['cnpj', 'cnae_primario']].copy()
+        df_primario.rename(columns={'cnae_primario': 'cnae'}, inplace=True)
 
-        dfs.append(df)
+        # Adicionando os cnaes secundários ao DataFrame
+        df_secundario = cnae_empresa[['cnpj', 'cnaes_secundarios']].copy()
+        df_secundario = df_secundario.explode('cnaes_secundarios').dropna()
+        df_secundario.rename(columns={'cnaes_secundarios': 'cnae'}, inplace=True)
 
-    # Passo 4: Consolidar os DataFrames em um único DataFrame
-    df_consolidado = pd.concat(dfs, ignore_index=True)
+        # Concatenando os DataFrames
+        df_final = pd.concat([df_primario, df_secundario], ignore_index=True)
+        cnaes_empresas.append(df_final)
+        empresas.append(empresa)
+
+    # Consolidar os DataFrames em um único DataFrame
+    cnaes_empresas_consolidado = pd.concat(cnaes_empresas, ignore_index=True)
+    empresas_consolidado = pd.concat(empresas, ignore_index=True)
 
     # Salvar o DataFrame consolidado como um novo arquivo CSV
-    caminho_saida = os.path.join(caminho_pasta, 'CNPJ_final.csv')  # Substitua pelo caminho e nome do arquivo desejado
-    df_consolidado.to_csv(caminho_saida, index=False)
+    cnaes_empresas_consolidado.to_csv(os.path.join(caminho_saida, 'cnae_empresas.csv'), index=False)
+    empresas_consolidado.to_csv(os.path.join(caminho_saida, 'empresas.csv'), index=False)
+                                      
